@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>TR-VOID | SHARE PANEL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #050505; color: #eee; font-family: sans-serif; }
+        .glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
+        .input-box { background: #000; border: 1px solid #222; padding: 20px; border-radius: 20px; color: #fff; width: 100%; margin-bottom: 20px; outline: none; }
+    </style>
+</head>
+<body class="p-8">
+    <div id="content" class="hidden max-w-4xl mx-auto">
+        <nav class="flex justify-between items-center mb-12">
+            <button onclick="location.href='index.html'"><img src="assets/home-icon.png" class="w-8 h-8"></button>
+            <h1 class="text-2xl font-black italic">TR-VOID <span class="text-blue-500">SHARE</span></h1>
+            <button onclick="location.href='index.html'" class="text-xs font-bold text-gray-600">GERİ</button>
+        </nav>
+
+        <div class="glass p-10 rounded-[3rem] border border-blue-500/10 mb-12">
+            <div class="flex items-center gap-4 mb-8">
+                <img src="assets/search-budget.png" class="w-8 h-8">
+                <h2 class="text-xl font-bold">Kod Paylaşımı</h2>
+            </div>
+            <input type="text" id="title" class="input-box" placeholder="Başlık">
+            <textarea id="code" class="input-box h-40 font-mono text-xs" placeholder="Kodlar..."></textarea>
+            <button onclick="publish()" class="w-full bg-blue-600 p-5 rounded-2xl font-black">PAYLAŞ</button>
+        </div>
+
+        <div id="admin-list" class="grid gap-4"></div>
+    </div>
+
+    <script>
+        const user = JSON.parse(sessionStorage.getItem('tr_void_user'));
+        if(!user) location.href='index.html'; else document.getElementById('content').classList.remove('hidden');
+
+        async function publish() {
+            await fetch('/api/api', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ title: document.getElementById('title').value, content: document.getElementById('code').value, author: user.username })
+            });
+            location.reload();
+        }
+
+        async function loadAdminCodes() {
+            const res = await fetch('/api/api');
+            const data = await res.json();
+            document.getElementById('admin-list').innerHTML = data.map(c => `
+                <div class="glass p-6 rounded-3xl flex justify-between items-center border border-white/5">
+                    <p class="text-white font-bold italic">${c.title}</p>
+                    <div class="flex gap-3">
+                        <button onclick="editCode('${c._id}')" class="bg-white/5 p-3 rounded-xl"><img src="assets/edit-code-pencil-icon.png" class="w-4 h-4"></button>
+                        <button onclick="deleteCode('${c._id}')" class="bg-red-500/10 p-3 rounded-xl text-red-500 text-xs font-black">SİL</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function editCode(id) {
+            const newC = prompt("Yeni kod:");
+            if(newC) {
+                await fetch('/api/api', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ _id: id, content: newC }) });
+                loadAdminCodes();
+            }
+        }
+
+        async function deleteCode(id) {
+            if(confirm("Sil?")) {
+                await fetch(`/api/api?id=${id}`, { method: 'DELETE' });
+                loadAdminCodes();
+            }
+        }
+        loadAdminCodes();
+    </script>
+</body>
+</html>
