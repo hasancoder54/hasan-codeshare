@@ -3,102 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TR</>VOID CODESHARE | v1.3.1</title>
+    <title>TR-VOID | CODESHARE v1.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --neon: #00f2ff; --bg: #050505; --card: #111; --error: #ff4b2b; --success: #00ff88; --blue: #008cff; }
-        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; -webkit-touch-callout: none; user-select: none; }
-
-        /* Discord ve Arama */
-        .dc-link { position: fixed; top: 15px; left: 15px; z-index: 1001; }
-        .dc-logo { width: 35px; border-radius: 8px; border: 1px solid #333; }
-        .search-container { position: fixed; top: 12px; right: 75px; z-index: 1001; display: flex; align-items: center; }
-        .search-input { width: 0; padding: 0; border: none; background: #1a1a1a; color: white; border-radius: 8px; outline: none; transition: 0.5s; opacity: 0; margin-right: 10px; }
-        .search-input.open { width: 160px; padding: 10px 15px; opacity: 1; border: 1px solid var(--blue); }
-        .search-trigger { width: 42px; height: 42px; cursor: pointer; transition: 0.6s; border-radius: 50%; border: 2px solid var(--blue); }
-        .rotate-icon { transform: rotate(360deg); }
-
-        /* Menü Animasyonu (Çarpıya Dönüşen) */
-        .menu-btn { position: fixed; top: 15px; right: 15px; z-index: 1001; cursor: pointer; padding: 10px; background: #1a1a1a; border-radius: 8px; border: 1px solid var(--neon); }
+        :root { --bg: #020204; --card: #08080a; --accent: #00a0ff; --neon: #00f2ff; }
+        body { background-color: var(--bg); color: #a1a1aa; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; user-select: none; }
+        .glass { background: rgba(8, 8, 10, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.03); }
+        .accent-text { color: var(--accent); }
+        .code-block { font-family: 'Fira Code', monospace; color: #00ff88; background: #000; }
+        
+        /* Menü Animasyonu (3 Çizgiden Çarpıya) */
         .menu-btn span { display: block; width: 22px; height: 2px; background: var(--neon); margin: 5px 0; transition: 0.4s; }
         .menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
         .menu-btn.open span:nth-child(2) { opacity: 0; }
         .menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-        /* Sidebar ve Kartlar */
-        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #0a0a0a; border-left: 1px solid #222; transition: 0.4s; z-index: 1000; padding: 80px 20px; box-sizing: border-box; }
+        /* Sidebar */
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #0a0a0a; border-left: 1px solid #222; transition: 0.4s; z-index: 1000; }
         .sidebar.open { right: 0; }
-        .view-section { display: none; padding: 80px 20px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .code-card { background: var(--card); border: 1px solid #222; padding: 18px; border-radius: 15px; margin-bottom: 25px; border-left: 4px solid var(--neon); }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; }
-        .status-Working { background: var(--success); color: #000; }
-        .status-Maintenance { background: #ffcc00; color: #000; }
-        .status-Patched { background: var(--error); color: #fff; }
-        .game-tag { color: var(--blue); font-size: 11px; text-transform: uppercase; display: block; }
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .status-Working { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.2); }
+        .status-Maintenance { background: rgba(255, 204, 0, 0.1); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.2); }
+        .status-Patched { background: rgba(255, 75, 43, 0.1); color: #ff4b2b; border: 1px solid rgba(255, 75, 43, 0.2); }
+
+        .view-section { display: none; animation: fadeIn 0.5s ease-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        pre { background: #000; padding: 15px; border-radius: 10px; overflow-x: auto; color: var(--success); font-size: 13px; border: 1px solid #222; }
-        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        button.primary { width: 100%; padding: 12px; background: var(--neon); border: none; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .admin-menu { display: none; position: absolute; background: #1a1a1a; border: 1px solid var(--neon); border-radius: 8px; z-index: 1100; }
+        /* Custom Admin Menu */
+        .longpress-menu { display: none; position: absolute; z-index: 2000; min-width: 160px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <a href="https://discord.gg/CWaH5ekr8M" target="_blank" class="dc-link">
-        <img src="https://i.ibb.co/bgnJfkWR/lv-0-20251219160720.jpg" alt="Discord" class="dc-logo">
-    </a>
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5 p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-extrabold tracking-tighter flex items-center gap-2">
+                <img src="https://i.ibb.co/bjTJkDgD/5ab05e8fd837e091202abc042de804d3-weather-cloud-flat-icon.png" class="w-6">
+                TR-VOID <span class="accent-text">CODESHARE</span>
+            </h1>
+            <div class="flex items-center gap-4">
+                <div class="relative flex items-center">
+                    <input type="text" id="searchInput" class="w-0 opacity-0 transition-all duration-500 bg-white/5 border border-white/10 rounded-lg text-xs outline-none text-white focus:w-40 focus:px-3 focus:py-2 focus:opacity-100" placeholder="Search script..." oninput="filterCodes()">
+                    <button onclick="toggleSearch()" class="text-gray-400 hover:text-white transition-all text-xl">
+                        <i class="fa-solid fa-magnifying-glass" id="searchIcon"></i>
+                    </button>
+                </div>
+                <div class="menu-btn cursor-pointer z-[1001] bg-white/5 p-2 rounded-lg border border-white/10" id="menuBtn" onclick="toggleMenu()">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search..." oninput="filterCodes()">
-        <img src="https://i.ibb.co/V0bvJWdG/lv-0-20251219180214.jpg" id="searchLogo" class="search-trigger" onclick="toggleSearch()">
-    </div>
-
-    <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-    </div>
-
-    <div class="sidebar" id="sidebar">
-        <h3 style="color:var(--neon)">NAVIGATION</h3>
-        <button onclick="changeView('home')" class="primary" style="background:#222; color:#fff; margin-bottom:10px;">Home</button>
+    <div class="sidebar p-8 pt-24" id="sidebar">
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">📂 Menu</h3>
+        <button onclick="changeView('home')" class="w-full text-left p-3 rounded-xl hover:bg-white/5 mb-2 transition-all flex items-center gap-3">
+            <i class="fa-solid fa-house text-blue-500"></i> Home
+        </button>
+        <hr class="border-white/5 my-4">
         <div id="guest-menu">
-            <input type="text" id="u" placeholder="Username">
-            <input type="password" id="p" placeholder="Password">
-            <button class="primary" onclick="login()">LOGIN</button>
+            <input type="text" id="u" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-3 text-sm" placeholder="Username">
+            <input type="password" id="p" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-3 text-sm" placeholder="Password">
+            <button onclick="login()" class="w-full bg-blue-600 p-3 rounded-xl text-white font-bold text-sm shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all">
+                🔓 LOGIN
+            </button>
         </div>
-        <div id="user-menu" style="display:none">
-            <button onclick="changeView('dashboard')" class="primary" style="background:var(--success)">🚀 Dashboard</button>
-            <button onclick="location.reload()" class="primary" style="background:#333; margin-top:10px; color:#fff">LOGOUT</button>
+        <div id="user-menu" class="hidden">
+            <button onclick="changeView('dashboard')" class="w-full text-left p-3 rounded-xl bg-green-500/10 text-green-500 mb-2 border border-green-500/20 flex items-center gap-3">
+                <i class="fa-solid fa-rocket"></i> Dashboard
+            </button>
+            <button onclick="location.reload()" class="w-full text-left p-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all flex items-center gap-3">
+                <i class="fa-solid fa-power-off"></i> Logout
+            </button>
+        </div>
+        <div class="mt-20">
+            <a href="https://discord.gg/CWaH5ekr8M" target="_blank" class="flex items-center gap-3 bg-[#5865F2] p-3 rounded-xl text-white text-xs font-bold justify-center">
+                <i class="fab fa-discord"></i> DISCORD SERVER
+            </a>
         </div>
     </div>
 
-    <section id="home-view" class="view-section active">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
-            <img src="https://i.ibb.co/bjTJkDgD/5ab05e8fd837e091202abc042de804d3-weather-cloud-flat-icon.png" style="width:35px;">
-            <h2 style="margin:0; color:var(--neon);">TR&lt;/&gt;VOID CODESHARE</h2>
-        </div>
-        <div id="code-list">Loading scripts...</div>
-    </section>
+    <main class="pt-32 px-6 max-w-5xl mx-auto pb-20">
+        
+        <section id="home-view" class="view-section active">
+            <header class="mb-12">
+                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.3em]">Mobile Script Library</span>
+                <h2 class="text-4xl font-black text-white mt-2">Explore <span class="accent-text">Void.</span></h2>
+            </header>
+            <div id="code-list" class="grid gap-6">
+                <p class="italic text-gray-600">📥 Connecting to database...</p>
+            </div>
+        </section>
 
-    <section id="dashboard-view" class="view-section">
-        <h2 style="color:var(--neon)">CREATOR DASHBOARD</h2>
-        <div style="background:#111; padding:25px; border-radius:15px; border:1px solid #222;">
-            <input type="text" id="code-title" placeholder="Script Name">
-            <input type="text" id="code-game" placeholder="Game Name (Universal, Blox Fruits etc.)">
-            <select id="code-status">
+        <section id="dashboard-view" class="view-section">
+            <h2 class="text-3xl font-black text-white mb-8 italic">🚀 CREATOR PANEL</h2>
+            <div class="glass p-8 rounded-3xl border border-white/10">
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="code-title" class="bg-black border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500 transition-all text-white" placeholder="Script Name 📝">
+                    <input type="text" id="code-game" class="bg-black border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500 transition-all text-white" placeholder="Game Name (Universal) 🎮">
+                </div>
+                <select id="code-status" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-4 outline-none text-white">
+                    <option value="Working">✅ Status: Working</option>
+                    <option value="Maintenance">🛠️ Status: Maintenance</option>
+                    <option value="Patched">❌ Status: Patched</option>
+                </select>
+                <textarea id="code-content" class="w-full bg-black border border-white/10 p-4 rounded-xl mb-6 h-64 outline-none focus:border-blue-500 transition-all text-green-400 font-mono text-sm" placeholder="-- Paste your code here..."></textarea>
+                <button onclick="uploadCode()" class="w-full bg-white text-black p-4 rounded-xl font-black hover:bg-blue-500 hover:text-white transition-all">PUBLISH SCRIPT</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="longpress-menu" class="longpress-menu glass rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+        <button onclick="closeMenu()" class="w-full p-3 text-left hover:bg-white/5 border-b border-white/5 text-gray-500 text-xs italic"><i class="fa-solid fa-arrow-left"></i> Geri Dön</button>
+        <button onclick="openEditModal()" class="w-full p-4 text-left hover:bg-white/5 text-sm font-bold flex items-center gap-3"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Düzenle</button>
+        <button onclick="deleteAction()" class="w-full p-4 text-left hover:bg-red-500/10 text-red-500 text-sm font-bold flex items-center gap-3"><i class="fa-solid fa-trash"></i> Sil</button>
+    </div>
+
+    <div id="editModal" class="fixed inset-0 z-[4000] hidden items-center justify-center bg-black/90 p-6 backdrop-blur-sm">
+        <div class="glass w-full max-w-lg p-8 rounded-[2rem] border border-blue-500/30">
+            <h3 class="text-xl font-black text-white mb-6 italic">🛠️ Script Editor</h3>
+            <input type="text" id="edit-title" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-4 text-sm text-white">
+            <input type="text" id="edit-game" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-4 text-sm text-white">
+            <select id="edit-status" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-4 text-sm text-white">
                 <option value="Working">Working</option>
                 <option value="Maintenance">Maintenance</option>
                 <option value="Patched">Patched</option>
             </select>
-            <textarea id="code-content" placeholder="Paste your code here..." style="height:150px;"></textarea>
-            <button class="primary" onclick="uploadCode()">PUBLISH SCRIPT</button>
+            <textarea id="edit-content" class="w-full bg-black border border-white/10 p-3 rounded-xl mb-6 h-40 text-xs text-green-400 font-mono"></textarea>
+            <div class="flex gap-3">
+                <button onclick="submitEdit()" class="flex-1 bg-blue-600 p-3 rounded-xl text-white font-bold transition-all hover:bg-blue-500">💾 GÜNCELLE</button>
+                <button onclick="closeEditModal()" class="flex-1 bg-white/5 p-3 rounded-xl text-gray-400 font-bold hover:bg-white/10">İPTAL</button>
+            </div>
         </div>
-    </section>
-
-    <div id="longpress-menu" class="admin-menu">
-        <button onclick="editAction()" style="width:100%; padding:12px; background:none; color:white; border:none; border-bottom:1px solid #222; cursor:pointer;">📝 Edit / Status</button>
-        <button onclick="deleteAction()" style="width:100%; padding:12px; background:none; color:var(--error); border:none; cursor:pointer;">🗑️ Delete</button>
     </div>
 
     <script>
@@ -114,31 +156,35 @@
 
         function toggleSearch() {
             const input = document.getElementById('searchInput');
-            const logo = document.getElementById('searchLogo');
-            logo.classList.toggle('rotate-icon');
-            input.classList.toggle('open');
-            if (input.classList.contains('open')) input.focus();
+            const icon = document.getElementById('searchIcon');
+            input.classList.toggle('opacity-0');
+            input.classList.toggle('w-0');
+            if (!input.classList.contains('w-0')) input.focus();
         }
 
         async function login() {
             const u = document.getElementById('u').value;
             const p = document.getElementById('p').value;
-            const res = await fetch('/api/api?type=users');
-            const users = await res.json();
-            const found = users.find(x => x.username === u && x.password === p);
-            if(found) {
-                currentUser = found;
-                document.getElementById('guest-menu').style.display = 'none';
-                document.getElementById('user-menu').style.display = 'block';
-                changeView('dashboard');
-                loadCodes();
-            } else { alert("Invalid Login"); }
+            try {
+                const res = await fetch('/api/api?type=users');
+                const users = await res.json();
+                const found = users.find(x => x.username === u && x.password === p);
+                if(found) {
+                    currentUser = found;
+                    document.getElementById('guest-menu').classList.add('hidden');
+                    document.getElementById('user-menu').classList.remove('hidden');
+                    changeView('dashboard');
+                    loadCodes();
+                } else { alert("❌ Invalid Login Credentials"); }
+            } catch(e) { alert("⚠️ Connection Error"); }
         }
 
         async function loadCodes() {
-            const res = await fetch('/api/api');
-            allCodes = await res.json();
-            renderCodes(allCodes);
+            try {
+                const res = await fetch('/api/api');
+                allCodes = await res.json();
+                renderCodes(allCodes);
+            } catch(e) { console.error("Load failed", e); }
         }
 
         function renderCodes(data) {
@@ -146,20 +192,21 @@
             list.innerHTML = "";
             data.forEach(code => {
                 const div = document.createElement('div');
-                div.className = 'code-card';
+                div.className = 'glass p-6 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all group';
                 div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span class="game-tag">${code.game || 'UNIVERSAL'}</span>
-                            <h4 style="margin:0; color:var(--neon);">${code.title}</h4>
+                            <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest block mb-1">🎮 ${code.game || 'Universal'}</span>
+                            <h4 class="text-lg font-bold text-white group-hover:accent-text transition-colors italic">${code.title}</h4>
                         </div>
-                        <div style="display:flex; align-items:center;">
-                            <span class="badge status-${code.status || 'Working'}">${(code.status || 'Working').toUpperCase()}</span>
-                            <button class="copy-btn" onclick="copyCode('${code._id}')" style="margin-left:10px; background:var(--neon); border:none; padding:5px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">COPY</button>
+                        <div class="flex items-center gap-3">
+                            <span class="badge status-${code.status || 'Working'}">${code.status || 'Working'}</span>
+                            <button onclick="copyCode('${code._id}')" class="bg-white/5 hover:bg-white text-gray-400 hover:text-black p-2 rounded-lg transition-all text-xs font-black border border-white/10 uppercase italic">Copy 📋</button>
                         </div>
                     </div>
-                    <pre><code>${code.content}</code></pre>
+                    <pre class="code-block p-4 rounded-xl text-[11px] overflow-x-auto border border-white/5 max-h-40"><code>${code.content}</code></pre>
                 `;
+                
                 div.onmousedown = (e) => startPress(e, code._id);
                 div.ontouchstart = (e) => startPress(e, code._id);
                 div.onmouseup = cancelPress;
@@ -176,47 +223,68 @@
                 menu.style.display = 'block';
                 const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
                 const y = e.pageY || (e.touches ? e.touches[0].pageY : 0);
-                menu.style.left = x + 'px';
+                menu.style.left = Math.min(x, window.innerWidth - 170) + 'px';
                 menu.style.top = y + 'px';
-            }, 800);
+            }, 700);
         }
+
         function cancelPress() { clearTimeout(pressTimer); }
-        window.onclick = () => document.getElementById('longpress-menu').style.display = 'none';
+        function closeMenu() { document.getElementById('longpress-menu').style.display = 'none'; }
+        function openEditModal() {
+            closeMenu();
+            const code = allCodes.find(x => x._id === selectedCodeId);
+            document.getElementById('edit-title').value = code.title;
+            document.getElementById('edit-game').value = code.game || "Universal";
+            document.getElementById('edit-status').value = code.status || "Working";
+            document.getElementById('edit-content').value = code.content;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+        async function submitEdit() {
+            const updated = {
+                _id: selectedCodeId,
+                title: document.getElementById('edit-title').value,
+                game: document.getElementById('edit-game').value,
+                status: document.getElementById('edit-status').value,
+                content: document.getElementById('edit-content').value
+            };
+            await fetch('/api/api', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updated)
+            });
+            closeEditModal();
+            loadCodes();
+        }
 
         async function uploadCode() {
             const title = document.getElementById('code-title').value;
             const game = document.getElementById('code-game').value || "Universal";
             const status = document.getElementById('code-status').value;
             const content = document.getElementById('code-content').value;
-            if(!title || !content) return;
+            if(!title || !content) return alert("Lütfen boş alan bırakma!");
 
             await fetch('/api/api', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, game, status, content, author: currentUser.username })
             });
+            alert("✅ Yayınlandı!");
             location.reload();
         }
 
-        async function editAction() {
-            const code = allCodes.find(x => x._id === selectedCodeId);
-            const newTitle = prompt("New Title:", code.title) || code.title;
-            const newGame = prompt("New Game:", code.game) || code.game;
-            const newStatus = prompt("Status (Working, Maintenance, Patched):", code.status) || code.status;
-            
-            await fetch('/api/api', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ _id: selectedCodeId, title: newTitle, game: newGame, status: newStatus })
-            });
-            loadCodes();
-        }
-
         async function deleteAction() {
-            if(confirm("Delete this script?")) {
+            if(confirm("Bu scripti kalıcı olarak silmek istiyor musun?")) {
                 await fetch(`/api/api?id=${selectedCodeId}`, { method: 'DELETE' });
+                closeMenu();
                 loadCodes();
             }
+        }
+
+        function copyCode(id) {
+            const code = allCodes.find(x => x._id === id);
+            navigator.clipboard.writeText(code.content).then(() => alert("✨ Code Copied!"));
         }
 
         function filterCodes() {
@@ -229,11 +297,6 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById(view + '-view').classList.add('active');
             if(window.innerWidth < 800) toggleMenu();
-        }
-
-        function copyCode(id) {
-            const code = allCodes.find(x => x._id === id);
-            navigator.clipboard.writeText(code.content).then(() => alert("Code Copied!"));
         }
 
         loadCodes();
