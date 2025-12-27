@@ -2,41 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TR-VOID | SHARE PANEL</title>
+    <title>TR-VOID | ADMIN PANEL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: #eee; font-family: sans-serif; overflow-x: hidden; }
+        body { background: #050505; color: #eee; font-family: sans-serif; }
         .glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
-        .input-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 24px; color: #fff; width: 100%; margin-bottom: 20px; outline: none; transition: 0.3s; }
-        .input-box:focus { border-color: #2563eb; box-shadow: 0 0 20px rgba(37,99,235,0.1); }
-        .fade-in { animation: fadeIn 0.6s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; scale: 0.95; } to { opacity: 1; scale: 1; } }
+        .input-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 20px; color: #fff; width: 100%; outline: none; transition: 0.3s; }
+        .input-box:focus { border-color: #2563eb; }
+        #editModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center; }
     </style>
 </head>
-<body class="p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black min-h-screen">
-    <div id="content" class="hidden max-w-4xl mx-auto fade-in">
+<body class="p-8 bg-black">
+    <div id="content" class="hidden max-w-4xl mx-auto">
         <nav class="flex justify-between items-center mb-12">
-            <button onclick="location.href='index.html'" class="hover:rotate-[-10deg] transition-transform">
-                <img src="home-icon.png" class="w-10 h-10 shadow-lg">
-            </button>
-            <h1 class="text-3xl font-black italic tracking-tighter text-white">TR-VOID <span class="text-blue-500">SHARE</span></h1>
-            <button onclick="location.href='index.html'" class="text-xs font-bold text-gray-500 hover:text-white transition-colors tracking-widest uppercase">BACK</button>
+            <button onclick="location.href='index.html'"><img src="home-icon.png" class="w-10 h-10"></button>
+            <h1 class="text-2xl font-black italic">SİSTEM YÖNETİMİ</h1>
+            <span class="text-blue-500 font-bold">ADMIN</span>
         </nav>
 
-        <div class="glass p-10 rounded-[3.5rem] border-blue-500/10 mb-12 shadow-2xl">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="p-3 bg-blue-600/20 rounded-2xl">
-                    <img src="search-budget.png" class="w-6 h-6">
-                </div>
-                <h2 class="text-2xl font-bold">Publish New Code</h2>
+        <div class="glass p-8 rounded-[3rem] mb-12 shadow-2xl">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <input type="text" id="title" class="input-box" placeholder="Script Title">
+                <input type="text" id="game" class="input-box" placeholder="Game Name (e.g. Delta/Roblox)">
             </div>
-            <input type="text" id="title" class="input-box" placeholder="Title (e.g. Discord Bot Base)">
-            <textarea id="code" class="input-box h-64 font-mono text-sm" placeholder="Paste your codes here..."></textarea>
-            <button onclick="publish()" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black transition-all transform active:scale-95 shadow-lg shadow-blue-600/20 uppercase">Publish to System</button>
+            <select id="status" class="input-box mb-4">
+                <option value="Working">✅ Working</option>
+                <option value="Maintenance">🛠 Maintenance</option>
+            </select>
+            <textarea id="code" class="input-box h-48 font-mono text-sm mb-4" placeholder="Script Content..."></textarea>
+            <button onclick="publish()" class="w-full bg-blue-600 p-5 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500">Add Script</button>
         </div>
 
-        <h3 class="text-sm font-bold text-blue-500 mb-6 tracking-[0.3em] uppercase ml-4">Managed Content</h3>
         <div id="admin-list" class="grid gap-4"></div>
+    </div>
+
+    <div id="editModal">
+        <div class="glass p-8 rounded-[3rem] w-full max-w-2xl border-blue-500/30">
+            <h2 class="text-2xl font-black italic mb-6">EDIT SCRIPT</h2>
+            <input type="hidden" id="editId">
+            <input type="text" id="editTitle" class="input-box mb-4" placeholder="Title">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <input type="text" id="editGame" class="input-box" placeholder="Game">
+                <select id="editStatus" class="input-box">
+                    <option value="Working">Working</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+            <textarea id="editContent" class="input-box h-64 font-mono text-xs mb-6"></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="w-full bg-white/5 p-4 rounded-2xl font-bold">CANCEL</button>
+                <button onclick="saveEdit()" class="w-full bg-blue-600 p-4 rounded-2xl font-bold">SAVE CHANGES</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -44,15 +61,14 @@
         if(!user) location.href='index.html'; else document.getElementById('content').classList.remove('hidden');
 
         async function publish() {
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('code').value;
-            if(!title || !content) return alert("Please fill all fields!");
-
-            await fetch('/api/api', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ title, content, author: user.username })
-            });
+            const data = {
+                title: document.getElementById('title').value,
+                game: document.getElementById('game').value,
+                status: document.getElementById('status').value,
+                content: document.getElementById('code').value,
+                author: user.username
+            };
+            await fetch('/api/api', { method: 'POST', body: JSON.stringify(data) });
             location.reload();
         }
 
@@ -60,31 +76,48 @@
             const res = await fetch('/api/api');
             const data = await res.json();
             document.getElementById('admin-list').innerHTML = data.map(c => `
-                <div class="glass p-6 rounded-[2rem] flex justify-between items-center hover:border-blue-500/30 transition-all">
-                    <div class="flex items-center gap-4">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <p class="text-white font-bold italic text-lg">${c.title}</p>
+                <div class="glass p-6 rounded-[2rem] flex justify-between items-center border border-white/5">
+                    <div>
+                        <p class="text-white font-bold">${c.title}</p>
+                        <p class="text-[10px] text-gray-500 uppercase">${c.game || 'Global'} | ${c.status || 'Working'}</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="editCode('${c._id}')" class="bg-white/5 hover:bg-blue-600/20 p-4 rounded-2xl transition-all">
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('${c._id}', '${c.title}', '${c.game}', '${c.status}', \`${encodeURIComponent(c.content)}\`)" class="bg-white/5 p-3 rounded-xl hover:bg-blue-600/20 transition-all">
                             <img src="edit-code-pencil-icon.png" class="w-4 h-4">
                         </button>
-                        <button onclick="deleteCode('${c._id}')" class="bg-red-500/5 hover:bg-red-500 p-4 px-6 rounded-2xl text-red-500 hover:text-white text-xs font-black transition-all uppercase">Delete</button>
+                        <button onclick="deleteCode('${c._id}')" class="bg-red-500/10 p-3 px-5 rounded-xl text-red-500 text-xs font-black">DELETE</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        async function editCode(id) {
-            const newC = prompt("Enter new code content:");
-            if(newC) {
-                await fetch('/api/api', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ _id: id, content: newC }) });
-                loadAdminCodes();
-            }
+        function openEditModal(id, title, game, status, content) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editGame').value = game || '';
+            document.getElementById('editStatus').value = status || 'Working';
+            document.getElementById('editContent').value = decodeURIComponent(content);
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+        async function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                _id: id,
+                title: document.getElementById('editTitle').value,
+                game: document.getElementById('editGame').value,
+                status: document.getElementById('editStatus').value,
+                content: document.getElementById('editContent').value
+            };
+            await fetch('/api/api', { method: 'PUT', body: JSON.stringify(data) });
+            closeModal();
+            loadAdminCodes();
         }
 
         async function deleteCode(id) {
-            if(confirm("Are you sure you want to delete this code?")) {
+            if(confirm("Delete this script?")) {
                 await fetch(`/api/api?id=${id}`, { method: 'DELETE' });
                 loadAdminCodes();
             }
