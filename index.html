@@ -16,7 +16,7 @@
 <body oncontextmenu="return false;">
 
     <a href="https://discord.gg/CWaH5ekr8M" target="_blank" class="fixed top-4 left-4 z-50">
-        <img src="assets/discord-icon.png" class="w-10 h-10 rounded-xl shadow-lg border border-white/10">
+        <img src="discord-icon.png" class="w-10 h-10 rounded-xl shadow-lg border border-white/10">
     </a>
 
     <nav class="fixed top-0 w-full glass p-4 flex justify-end z-50">
@@ -31,7 +31,7 @@
         </div>
         <div id="admin-panel" class="hidden">
             <button onclick="location.href='share.html'" class="w-full bg-blue-500/20 text-blue-400 p-4 rounded-xl border border-blue-500/30 flex items-center gap-3">
-                <img src="assets/settings-icon.png" class="w-5 h-5"> Yönetim Paneli
+                <img src="settings-icon.png" class="w-5 h-5"> Yönetim Paneli
             </button>
             <button onclick="sessionStorage.clear(); location.reload();" class="w-full text-red-500 mt-6 text-xs font-bold uppercase">Çıkış Yap</button>
         </div>
@@ -39,7 +39,7 @@
 
     <main class="pt-32 px-6 max-w-5xl mx-auto pb-20">
         <div class="flex items-center gap-5 mb-12">
-            <img src="assets/thought-bubble-code-share-icon.png" class="w-14 h-14">
+            <img src="thought-bubble-code-share-icon.png" class="w-14 h-14">
             <h1 class="text-4xl font-black text-white italic tracking-tighter">TR-VOID <span class="text-blue-500">CODESHARE</span></h1>
         </div>
         <div id="code-list" class="grid gap-6"></div>
@@ -64,7 +64,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h4 class="text-xl font-bold text-white italic">${code.title}</h4>
                         <button onclick="copyCode(\`${code.content}\`)" class="bg-white/5 p-3 px-6 rounded-2xl flex items-center gap-3 text-xs font-black text-white">
-                            <img src="assets/copy-text-icon.png" class="w-4 h-4"> COPY
+                            <img src="copy-text-icon.png" class="w-4 h-4"> COPY
                         </button>
                     </div>
                     <pre class="bg-black/50 p-6 rounded-3xl text-xs text-green-400 overflow-auto max-h-48 font-mono border border-white/5"><code>${code.content}</code></pre>
