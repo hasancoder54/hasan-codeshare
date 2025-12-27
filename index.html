@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TR-VOID CODESHARE | v1.0.1</title>
+    <title>TR-VOID CODESHARE | v1.1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --neon: #00f2ff; --bg: #050505; }
@@ -15,93 +15,113 @@
         .glass:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(59, 130, 246, 0.5); transform: translateY(-5px); }
         .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; border-left: 1px solid rgba(255,255,255,0.1); }
         .sidebar.open { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
-        .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); transition: 0.3s; }
-        code::-webkit-scrollbar { width: 5px; height: 5px; }
-        code::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .search-box:focus-within { border-color: #2563eb; box-shadow: 0 0 20px rgba(37,99,235,0.2); }
     </style>
 </head>
 <body oncontextmenu="return false;">
     <div class="bg-glow"></div>
 
-    <a href="https://discord.gg/CWaH5ekr8M" target="_blank" class="fixed top-6 left-6 z-50 hover:scale-110 transition-transform">
-        <img src="discord-icon.png" class="w-12 h-12 rounded-2xl shadow-[0_0_20px_rgba(88,101,242,0.4)] border border-white/10">
-    </a>
-
-    <nav class="fixed top-0 w-full glass p-5 flex justify-end z-50 border-none">
-        <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="text-white hover:text-blue-400 transition-colors text-3xl px-4">☰</button>
+    <nav class="fixed top-0 w-full glass p-5 flex justify-between items-center z-50 border-none px-10">
+        <div class="flex items-center gap-2">
+            <img src="thought-bubble-code-share-icon.png" class="w-8 h-8">
+            <span class="font-black italic text-xl tracking-tighter">TR-VOID</span>
+        </div>
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="text-white hover:text-blue-400 transition-colors text-3xl">☰</button>
     </nav>
 
     <div class="sidebar p-8 pt-24" id="sidebar">
         <button onclick="location.href='index.html'" class="w-full bg-white/5 hover:bg-white/10 p-4 rounded-2xl mb-8 flex items-center gap-4 border border-white/10 transition-all group">
-            <img src="home-icon.png" class="w-6 h-6 group-hover:scale-110 transition-transform">
-            <span class="font-bold text-white tracking-widest">HOME</span>
+            <img src="home-icon.png" class="w-6 h-6 group-hover:scale-110">
+            <span class="font-bold text-white tracking-widest uppercase">Home</span>
         </button>
-
         <div id="login-form">
             <h3 class="text-xl font-bold mb-6 text-blue-500 italic">Admin Login</h3>
-            <input type="text" id="u" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 text-white outline-none focus:border-blue-500 transition-all" placeholder="Username">
-            <input type="password" id="p" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-6 text-white outline-none focus:border-blue-500 transition-all" placeholder="Password">
-            <button onclick="login()" class="w-full btn-primary p-4 rounded-2xl text-white font-bold shadow-lg shadow-blue-900/20">Login</button>
+            <input type="text" id="u" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 text-white outline-none focus:border-blue-500" placeholder="Username">
+            <input type="password" id="p" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-6 text-white outline-none focus:border-blue-500" placeholder="Password">
+            <button onclick="login()" class="w-full bg-blue-600 p-4 rounded-2xl text-white font-bold shadow-lg shadow-blue-900/20">Login</button>
         </div>
-
         <div id="admin-panel" class="hidden">
-            <div class="p-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl mb-6">
-                <button onclick="location.href='share.html'" class="w-full bg-black/90 text-white p-4 rounded-[14px] flex items-center justify-center gap-3 hover:bg-transparent transition-all">
-                    <img src="settings-icon.png" class="w-5 h-5"> Management Panel
-                </button>
-            </div>
+            <button onclick="location.href='share.html'" class="w-full bg-blue-500/20 text-blue-400 p-4 rounded-2xl border border-blue-500/30 flex items-center justify-center gap-3">
+                <img src="settings-icon.png" class="w-5 h-5"> Management Panel
+            </button>
             <button onclick="sessionStorage.clear(); location.reload();" class="w-full text-red-500/50 hover:text-red-500 transition-colors mt-6 text-xs font-bold uppercase tracking-widest">Logout</button>
         </div>
     </div>
 
-    <main class="pt-36 px-6 max-w-5xl mx-auto pb-20 fade-in">
-        <div class="flex flex-col items-center text-center mb-16">
-            <img src="thought-bubble-code-share-icon.png" class="w-20 h-20 mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-            <h1 class="text-5xl font-black text-white italic tracking-tighter">TR-VOID <span class="text-blue-600">CODESHARE</span></h1>
-            <p class="text-gray-500 mt-2 font-medium tracking-wide uppercase text-[10px]">Future of Code Sharing Platform</p>
+    <main class="pt-32 px-6 max-w-5xl mx-auto pb-20 fade-in">
+        <div class="max-w-2xl mx-auto mb-16">
+            <div class="search-box flex items-center px-6 py-4 rounded-3xl gap-4">
+                <img src="search-budget.png" class="w-5 h-5 opacity-50">
+                <input type="text" id="searchInput" oninput="searchCodes()" class="bg-transparent w-full outline-none text-white placeholder-gray-500" placeholder="Search by title or game name (e.g. Roblox)...">
+            </div>
         </div>
         
         <div id="code-list" class="grid gap-8"></div>
     </main>
 
     <script>
-        async function login() {
-            try {
-                const res = await fetch('/api/api?type=users');
-                const users = await res.json();
-                const found = users.find(x => x.username === document.getElementById('u').value && x.password === document.getElementById('p').value);
-                if(found) {
-                    sessionStorage.setItem('tr_void_user', JSON.stringify(found));
-                    location.href = 'share.html';
-                } else alert("Invalid username or password!");
-            } catch(e) { alert("Connection error!"); }
-        }
+        let allCodes = [];
 
         async function loadCodes() {
             const res = await fetch('/api/api');
-            const data = await res.json();
-            document.getElementById('code-list').innerHTML = data.map((code, index) => `
-                <div class="glass p-8 rounded-[2.5rem] relative overflow-hidden group" style="animation: fadeIn 0.5s ease-out ${index * 0.1}s both">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div class="flex justify-between items-center mb-6">
+            allCodes = await res.json();
+            renderCodes(allCodes);
+        }
+
+        function renderCodes(data) {
+            document.getElementById('code-list').innerHTML = data.map((code, index) => {
+                const statusColor = code.status === 'Working' ? 'text-green-400 bg-green-400/10' : 'text-yellow-400 bg-yellow-400/10';
+                return `
+                <div class="glass p-8 rounded-[2.5rem] relative overflow-hidden group">
+                    <div class="flex justify-between items-start mb-6">
                         <div>
-                            <h4 class="text-2xl font-black text-white italic">${code.title}</h4>
-                            <span class="text-[10px] text-blue-500 font-bold tracking-widest uppercase">Author: ${code.author || 'Anonymous'}</span>
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-2xl font-black text-white italic">${code.title}</h4>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${statusColor}">${code.status || 'Working'}</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-[10px] text-blue-500 font-bold uppercase tracking-widest">🎮 ${code.game || 'Global'}</span>
+                                <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">👤 ${code.author || 'Anon'}</span>
+                            </div>
                         </div>
-                        <button onclick="copyCode(\`${code.content}\`)" class="bg-blue-600/10 hover:bg-blue-600 p-3 px-6 rounded-2xl flex items-center gap-3 text-xs font-black text-white transition-all">
+                        <button onclick="copyToClipboard(this)" data-content="${encodeURIComponent(code.content)}" class="bg-blue-600 hover:bg-blue-500 p-3 px-6 rounded-2xl flex items-center gap-3 text-xs font-black text-white transition-all shadow-lg shadow-blue-600/20">
                             <img src="copy-text-icon.png" class="w-4 h-4 brightness-200"> COPY
                         </button>
                     </div>
-                    <pre class="bg-black/40 p-6 rounded-3xl text-sm text-blue-300 overflow-auto max-h-64 font-mono border border-white/5 leading-relaxed"><code>${code.content}</code></pre>
-                </div>
-            `).join('');
+                    <pre class="bg-black/40 p-6 rounded-3xl text-sm text-blue-300 overflow-auto max-h-64 font-mono border border-white/5"><code>${code.content}</code></pre>
+                </div>`;
+            }).join('');
         }
-        function copyCode(txt) { 
-            navigator.clipboard.writeText(txt);
-            const btn = event.currentTarget;
-            btn.innerText = "COPIED!";
-            setTimeout(() => { btn.innerHTML = `<img src="copy-text-icon.png" class="w-4 h-4 brightness-200"> COPY`; }, 2000);
+
+        function searchCodes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allCodes.filter(c => 
+                c.title.toLowerCase().includes(query) || 
+                (c.game && c.game.toLowerCase().includes(query))
+            );
+            renderCodes(filtered);
         }
+
+        function copyToClipboard(btn) {
+            const content = decodeURIComponent(btn.getAttribute('data-content'));
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerText = "COPIED!";
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            }).catch(err => {
+                alert("Copy failed! Please select and copy manually.");
+            });
+        }
+
+        async function login() {
+            const res = await fetch('/api/api?type=users');
+            const users = await res.json();
+            const found = users.find(x => x.username === document.getElementById('u').value && x.password === document.getElementById('p').value);
+            if(found) { sessionStorage.setItem('tr_void_user', JSON.stringify(found)); location.href = 'share.html'; }
+            else alert("Error!");
+        }
+
         loadCodes();
         if(sessionStorage.getItem('tr_void_user')) {
             document.getElementById('login-form').classList.add('hidden');
