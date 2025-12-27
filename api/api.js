@@ -16,6 +16,12 @@ module.exports = async (req, res) => {
         const codesColl = db.collection("codes");
         const usersColl = db.collection("users");
 
+        // Gönderilen veriyi işle
+        let body = {};
+        if (req.body) {
+            body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        }
+
         if (req.method === "GET") {
             const { type } = req.query;
             if (type === "users") {
@@ -27,13 +33,12 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === "POST") {
-            const { title, content, game, status, author } = JSON.parse(req.body);
             const newCode = {
-                title,
-                content,
-                game: game || "Universal",
-                status: status || "Working",
-                author: author || "Admin",
+                title: body.title,
+                content: body.content,
+                game: body.game || "Universal",
+                status: body.status || "Working",
+                author: body.author || "Admin",
                 createdAt: new Date()
             };
             await codesColl.insertOne(newCode);
@@ -41,10 +46,8 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === "PUT") {
-            const data = JSON.parse(req.body);
-            const id = data._id;
-            delete data._id;
-            await codesColl.updateOne({ _id: new ObjectId(id) }, { $set: data });
+            const { _id, ...updateData } = body;
+            await codesColl.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
             return res.status(200).json({ msg: "Updated" });
         }
 
