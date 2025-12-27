@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TR</>VOID CODESHARE | v1.3.0</title>
+    <style>
+        :root { --neon: #00f2ff; --bg: #050505; --card: #111; --error: #ff4b2b; --success: #00ff88; --blue: #008cff; }
+        body { background: var(--bg); color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; user-select: none; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; }
+        .status-Working { background: var(--success); color: #000; }
+        .status-Maintenance { background: #ffcc00; color: #000; }
+        .status-Patched { background: var(--error); color: #fff; }
+        .game-tag { color: var(--blue); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+        /* Arama ve Sidebar (Senin Mevcut Stillerin) */
+        .search-container { position: fixed; top: 12px; right: 75px; z-index: 1001; display: flex; align-items: center; }
+        .search-input { width: 0; padding: 0; border: none; background: #1a1a1a; color: white; border-radius: 8px; outline: none; transition: 0.5s; opacity: 0; margin-right: 10px; }
+        .search-input.open { width: 160px; padding: 10px 15px; opacity: 1; border: 1px solid var(--blue); }
+        .search-trigger { width: 42px; height: 42px; cursor: pointer; transition: 0.6s; border-radius: 50%; border: 2px solid var(--blue); }
+        .rotate-icon { transform: rotate(360deg); }
+        .menu-btn { position: fixed; top: 15px; right: 15px; z-index: 1001; cursor: pointer; padding: 10px; background: #1a1a1a; border-radius: 8px; border: 1px solid var(--neon); }
+        .menu-btn span { display: block; width: 22px; height: 2px; background: var(--neon); margin: 5px 0; transition: 0.4s; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #0a0a0a; border-left: 1px solid #222; transition: 0.4s; z-index: 1000; padding: 80px 20px; box-sizing: border-box; }
+        .sidebar.open { right: 0; }
+        .view-section { display: none; padding: 80px 20px; max-width: 900px; margin: 0 auto; }
+        .view-section.active { display: block; }
+
+        /* Kartlar */
+        .code-card { background: var(--card); border: 1px solid #222; padding: 18px; border-radius: 15px; margin-bottom: 25px; border-left: 4px solid var(--neon); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { margin: 0; color: var(--neon); font-size: 18px; }
+        .copy-btn { background: var(--neon); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: pointer; }
+        pre { background: #000; padding: 15px; border-radius: 10px; overflow-x: auto; color: var(--success); font-size: 13px; border: 1px solid #222; }
+        
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        button.primary { width: 100%; padding: 12px; background: var(--neon); border: none; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .admin-menu { display: none; position: absolute; background: #1a1a1a; border: 1px solid var(--neon); border-radius: 8px; z-index: 1100; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search..." oninput="filterCodes()">
+        <img src="https://i.ibb.co/V0bvJWdG/lv-0-20251219180214.jpg" id="searchLogo" class="search-trigger" onclick="toggleSearch()">
+    </div>
+
+    <div class="menu-btn" id="menuBtn" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <h3 style="color:var(--neon)">NAVIGATION</h3>
+        <button onclick="changeView('home')" class="primary" style="background:#222; color:#fff; margin-bottom:10px;">Home</button>
+        <div id="guest-menu">
+            <input type="text" id="u" placeholder="Username">
+            <input type="password" id="p" placeholder="Password">
+            <button class="primary" onclick="login()">LOGIN</button>
+        </div>
+        <div id="user-menu" style="display:none">
+            <button onclick="changeView('dashboard')" class="primary" style="background:var(--success)">🚀 Dashboard</button>
+            <button onclick="location.reload()" class="primary" style="background:#333; margin-top:10px; color:#fff">LOGOUT</button>
+        </div>
+    </div>
+
+    <section id="home-view" class="view-section active">
+        <h2 style="color:var(--neon)">TR&lt;/&gt;VOID CODESHARE</h2>
+        <div id="code-list">Loading scripts...</div>
+    </section>
+
+    <section id="dashboard-view" class="view-section">
+        <h2 style="color:var(--neon)">CREATOR DASHBOARD</h2>
+        <div style="background:#111; padding:25px; border-radius:15px;">
+            <input type="text" id="code-title" placeholder="Script Name">
+            <input type="text" id="code-game" placeholder="Game Name (e.g. Universal, Pet Simulator)">
+            <select id="code-status">
+                <option value="Working">Working</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Patched">Patched</option>
+            </select>
+            <textarea id="code-content" placeholder="Paste your code here..." style="height:150px;"></textarea>
+            <button class="primary" onclick="uploadCode()">PUBLISH SCRIPT</button>
+        </div>
+    </section>
+
+    <div id="longpress-menu" class="admin-menu">
+        <button onclick="editAction()" style="width:100%; padding:10px; background:none; color:white; border:none;">📝 Edit</button>
+        <button onclick="deleteAction()" style="width:100%; padding:10px; background:none; color:var(--error); border:none;">🗑️ Delete</button>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allCodes = [];
+        let pressTimer;
+        let selectedCodeId = null;
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('menuBtn').classList.toggle('open');
+        }
+
+        function toggleSearch() {
+            const input = document.getElementById('searchInput');
+            const logo = document.getElementById('searchLogo');
+            logo.classList.toggle('rotate-icon');
+            input.classList.toggle('open');
+            if (input.classList.contains('open')) input.focus();
+        }
+
+        function filterCodes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allCodes.filter(c => c.title.toLowerCase().includes(query) || (c.game && c.game.toLowerCase().includes(query)));
+            renderCodes(filtered);
+        }
+
+        function changeView(view) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(view + '-view').classList.add('active');
+            toggleMenu();
+        }
+
+        async function login() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            const res = await fetch('/api/api?type=users');
+            const users = await res.json();
+            const found = users.find(x => x.username === u && x.password === p);
+            if(found) {
+                currentUser = found;
+                document.getElementById('guest-menu').style.display = 'none';
+                document.getElementById('user-menu').style.display = 'block';
+                changeView('dashboard');
+            } else { alert("Invalid Login"); }
+        }
+
+        async function loadCodes() {
+            const res = await fetch('/api/api');
+            allCodes = await res.json();
+            renderCodes(allCodes);
+        }
+
+        function renderCodes(data) {
+            const list = document.getElementById('code-list');
+            list.innerHTML = "";
+            data.forEach(code => {
+                const div = document.createElement('div');
+                div.className = 'code-card';
+                div.innerHTML = `
+                    <div class="card-header">
+                        <div style="flex:1">
+                            <span class="game-tag">${code.game || 'UNIVERSAL'}</span>
+                            <h4 class="card-title">${code.title}</h4>
+                        </div>
+                        <span class="badge status-${code.status || 'Working'}">${(code.status || 'Working').toUpperCase()}</span>
+                        <button class="copy-btn" onclick="copyCode('${code._id}')">COPY</button>
+                    </div>
+                    <pre><code>${code.content}</code></pre>
+                `;
+                div.onmousedown = (e) => startPress(e, code._id);
+                div.ontouchstart = (e) => startPress(e, code._id);
+                div.onmouseup = cancelPress;
+                div.ontouchend = cancelPress;
+                list.appendChild(div);
+            });
+        }
+
+        function copyCode(id) {
+            const code = allCodes.find(x => x._id === id);
+            navigator.clipboard.writeText(code.content).then(() => alert("Copied!"));
+        }
+
+        function startPress(e, id) {
+            if (!currentUser) return;
+            selectedCodeId = id;
+            pressTimer = setTimeout(() => {
+                const menu = document.getElementById('longpress-menu');
+                menu.style.display = 'block';
+                menu.style.left = (e.pageX || e.touches[0].pageX) + 'px';
+                menu.style.top = (e.pageY || e.touches[0].pageY) + 'px';
+            }, 800);
+        }
+        function cancelPress() { clearTimeout(pressTimer); }
+        window.onclick = () => document.getElementById('longpress-menu').style.display = 'none';
+
+        async function uploadCode() {
+            const title = document.getElementById('code-title').value;
+            const game = document.getElementById('code-game').value;
+            const status = document.getElementById('code-status').value;
+            const content = document.getElementById('code-content').value;
+            await fetch('/api/api', {
+                method: 'POST',
+                body: JSON.stringify({ title, game, status, content, author: currentUser.username })
+            });
+            location.reload();
+        }
+
+        async function deleteAction() {
+            if(confirm("Delete?")) {
+                await fetch(`/api/api?id=${selectedCodeId}`, { method: 'DELETE' });
+                loadCodes();
+            }
+        }
+        
+        loadCodes();
+    </script>
+</body>
+</html>
